@@ -9,6 +9,9 @@ GLTF files include animations in their files. Importing them into bevy can be te
 This crate automatically creates a handler for your animations per scene root based on the imported GLTF file.
 
 ## Example
+[the `transitions.rs` example](https://github.com/user-attachments/assets/d2248964-71c3-40ae-9767-3f2d10a1a4b6)
+
+
 
 ```rust, ignore
 use bevy::prelude::*;
