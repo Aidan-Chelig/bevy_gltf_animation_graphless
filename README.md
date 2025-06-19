@@ -66,7 +66,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn play_animations(
     animations: Query<&mut GltfAnimations, Added<GltfAnimations>>,
 ) {
-    for mut animation_player in humans {
+    for mut animation_player in animations {
         animation_player.play(2);
     }
 }
