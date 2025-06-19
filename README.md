@@ -10,6 +10,7 @@ This crate automatically creates a handler for your animations per scene root ba
 
 ## Example
 This video is taken from `examples/transitions.rs`.
+
 [the `transitions.rs` example](https://github.com/user-attachments/assets/d2248964-71c3-40ae-9767-3f2d10a1a4b6)
 
 
