@@ -1,6 +1,6 @@
 [package]
 name = "bevy_gltf_animation"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["dsgallups <dsgallups@protonmail.com>"]
 edition = "2024"
 license = "MIT OR Apache-2.0"
@@ -16,16 +16,16 @@ exclude = ["assets/*"]
 extended = []
 
 [dependencies]
-bevy = { version = "0.16", default-features = false, features = [
+bevy = { version = "0.17", default-features = false, features = [
     "bevy_scene",
     "bevy_log",
     "bevy_gltf",
     "bevy_animation",
 ] }
-bevy_gltf = { version = "0.16", features = ["bevy_animation"] }
+bevy_gltf = { version = "0.17", features = ["bevy_animation"] }
 
 [dev-dependencies]
-bevy = "0.16"
+bevy = "0.17"
 
 [lints.clippy]
 type-complexity = "allow"
