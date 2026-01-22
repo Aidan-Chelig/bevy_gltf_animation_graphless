@@ -28,16 +28,14 @@ impl GltfSceneRoot {
 
 #[derive(Component, Debug)]
 pub struct GltfAnimations {
-    numbers: HashMap<usize, AnimationNodeIndex>,
-    names: HashMap<String, AnimationNodeIndex>,
+    numbers: HashMap<usize, Handle<AnimationClip>>,
+    names: HashMap<String, Handle<AnimationClip>>,
     // used in a post update system and then cleared
-    #[cfg(feature = "extended")]
-    pub(crate) animation_to_play: Option<AnimationNodeIndex>,
     pub animation_player: Entity,
 }
 
 impl GltfAnimations {
-    pub(crate) fn new(gltf: &Gltf, animation_player: Entity) -> (Self, AnimationGraph) {
+    pub(crate) fn new(gltf: &Gltf, animation_player: Entity) -> Self {
         let mut map = HashMap::new();
 
         //we're going to reverse this
@@ -68,39 +66,37 @@ impl GltfAnimations {
         //idk if this is true
         debug_assert!(map.is_empty());
 
-        let mut animation_graph = AnimationGraph::new();
-
         let mut number_map = HashMap::new();
         let mut named_map = HashMap::new();
 
         for (handle, name, number) in unique_handles {
-            let node_index = animation_graph.add_clip(handle, 1.0, animation_graph.root);
+            let clip_index = handle;
 
-            number_map.insert(number, node_index);
+            number_map.insert(number, clip_index.clone());
             if let Some(name) = name {
-                named_map.insert(name, node_index);
+                named_map.insert(name, clip_index);
             }
         }
 
-        let animations = Self {
+        Self {
             numbers: number_map,
             names: named_map,
-            #[cfg(feature = "extended")]
-            animation_to_play: None,
             animation_player,
-        };
-
-        (animations, animation_graph)
+        }
     }
 
     /// Get an animation by its gltf ID
-    pub fn get_by_number(&mut self, index: usize) -> Option<AnimationNodeIndex> {
-        self.numbers.get(&index).copied()
+    pub fn get_by_number(&mut self, index: usize) -> Option<&Handle<AnimationClip>> {
+        self.numbers.get(&index)
     }
 
     /// Get an animation node index by its gltf name
-    pub fn get_by_name(&mut self, index: &str) -> Option<AnimationNodeIndex> {
-        self.names.get(index).copied()
+    pub fn get_by_name(&mut self, index: &str) -> Option<&Handle<AnimationClip>> {
+        self.names.get(index)
+    }
+
+    pub fn contains(&self, k: &str) -> bool {
+        self.names.contains_key(k)
     }
 
     /// Returns the animation node index for the graph. This is better for animations
@@ -108,21 +104,11 @@ impl GltfAnimations {
     pub fn get<'a>(
         &mut self,
         index: impl Into<GltfAnimationIndexQuery<'a>>,
-    ) -> Option<AnimationNodeIndex> {
+    ) -> Option<&Handle<AnimationClip>> {
         match index.into() {
-            GltfAnimationIndexQuery::Name(v) => self.names.get(v).copied(),
-            GltfAnimationIndexQuery::Number(n) => self.numbers.get(&n).copied(),
+            GltfAnimationIndexQuery::Name(v) => self.names.get(v),
+            GltfAnimationIndexQuery::Number(n) => self.numbers.get(&n),
         }
-    }
-
-    /// a simple helper that will allow you to play an animation.
-    /// doing this will run in `PostUpdate`
-    #[cfg(feature = "extended")]
-    pub fn play<'a>(&mut self, index: impl Into<GltfAnimationIndexQuery<'a>>) {
-        let Some(value) = self.get(index) else {
-            return;
-        };
-        self.animation_to_play = Some(value);
     }
 }
 

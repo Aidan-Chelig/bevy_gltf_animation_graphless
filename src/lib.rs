@@ -13,9 +13,6 @@ pub struct DoNotInsertGltfAnimationPlayer;
 impl Plugin for GltfAnimationPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PreUpdate, load_scene);
-
-        #[cfg(feature = "extended")]
-        app.add_systems(PostUpdate, play_requested_animations);
     }
 }
 
@@ -90,33 +87,13 @@ fn setup_animations(
         return;
     };
 
-    let (animations, graph) = GltfAnimations::new(gltf, animation_player);
-
-    let graph_handle = graphs.add(graph);
+    let animations = GltfAnimations::new(gltf, animation_player);
 
     let mut animation_player_commands = commands.entity(animation_player);
-
-    animation_player_commands.insert(AnimationGraphHandle(graph_handle));
 
     if gltf_scene_root.use_animation_transitions {
         animation_player_commands.insert(AnimationTransitions::new());
     }
 
     commands.entity(scene_root).insert(animations);
-}
-
-#[cfg(feature = "extended")]
-fn play_requested_animations(
-    mut animations: Query<&mut GltfAnimations>,
-    mut players: Query<&mut AnimationPlayer>,
-) {
-    for mut animation in &mut animations {
-        let Some(index) = animation.animation_to_play.take() else {
-            continue;
-        };
-
-        let mut player = players.get_mut(animation.animation_player).unwrap();
-        player.stop_all();
-        player.play(index);
-    }
 }
