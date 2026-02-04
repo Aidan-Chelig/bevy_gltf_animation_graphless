@@ -63,7 +63,6 @@ fn setup_animations(
     animation_players: Query<Entity, With<AnimationPlayer>>,
     scene_root: Query<(Entity, &GltfSceneRoot)>,
     gltfs: Res<Assets<Gltf>>,
-    mut graphs: ResMut<Assets<AnimationGraph>>,
 ) {
     let target = ev.event_target();
     let Some(animation_player) = children
